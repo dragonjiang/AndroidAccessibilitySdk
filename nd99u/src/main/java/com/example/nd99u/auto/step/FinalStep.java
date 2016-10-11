@@ -60,6 +60,9 @@ public class FinalStep implements IStep {
             mMachine.setResult(Constants.RUN_RESULT.SUCCESS);
             mMachine.reset();
             mMachine.setNextStep(mMachine.getExitStep(), true);
+            if(mSubscription != null && !mSubscription.isUnsubscribed()){
+                mSubscription.unsubscribe();
+            }
             return;
         }
 
