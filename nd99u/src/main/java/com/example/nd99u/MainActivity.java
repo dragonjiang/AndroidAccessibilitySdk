@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,9 +19,13 @@ import com.demo.dragonjiang.accessilibility_sdk.utils.SPUtils;
 import com.demo.dragonjiang.accessilibility_sdk.utils.TimeUtil;
 import com.example.nd99u.utils.log.utils.LogUtils;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import rx.Subscriber;
+import rx.functions.Action1;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, TimePickerDialog
         .OnTimeSetListener {
@@ -83,26 +88,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             saveLaunchTime();
 
             NotificationService.startService(MainActivity.this);
+            EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.START));
 
-            CmdExecutor.executeCancelable(new ShellHomeCmd(), 1000, false)
-                    .subscribe(new Subscriber<Integer>() {
+            CmdExecutor.executeObservable(new ShellHomeCmd()).delaySubscription(1000, TimeUnit.MILLISECONDS)
+                    .subscribe(new Action1<Integer>() {
                         @Override
-                        public void onCompleted() {
-                            LogUtils.FLLog(TAG, "钉钉签到程序将在后台持续为您服务");
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onNext(Integer integer) {
-
+                        public void call(Integer integer) {
+                            Log.i(TAG, "99U自动化插件将在后台持续为您服务");
                         }
                     });
 
         } else if (id == R.id.btn_stop) {
+            EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.STOP));
+
             Intent stopIntent = new Intent(MainActivity.this, NotificationService.class);
             stopIntent.setAction(Constants.ACTION.STOP_FOREGROUND);
             startService(stopIntent);
@@ -117,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        LogUtils.FLLog(TAG, "hour:" + hourOfDay + "   minute:" + minute);
+        Log.i(TAG, "hour:" + hourOfDay + "   minute:" + minute);
 
         String time = buildTimeString(hourOfDay, minute);
 

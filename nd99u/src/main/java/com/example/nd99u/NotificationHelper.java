@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.demo.dragonjiang.accessilibility_sdk.core.ResetStateEvent;
 import com.demo.dragonjiang.accessilibility_sdk.core.command.CmdExecutor;
 import com.demo.dragonjiang.accessilibility_sdk.core.command.shellCmd.ShellHomeCmd;
 import com.demo.dragonjiang.accessilibility_sdk.core.command.shellCmd.ShellPowerCmd;
@@ -99,7 +98,7 @@ public class NotificationHelper {
      * reset send flower step
      */
     public void resetStep() {
-        EventBus.getDefault().post(new ResetStateEvent());
+        EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.RESET));
     }
 
     public long parseNextTime(@NonNull final String time) {

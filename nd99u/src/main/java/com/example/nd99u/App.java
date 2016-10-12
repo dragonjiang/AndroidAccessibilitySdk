@@ -17,6 +17,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         ContextUtils.setAppContext(getApplicationContext());
-        Logger.init().hideThreadInfo().methodCount(0);
+//        Logger.init().hideThreadInfo().methodCount(0);
     }
 }

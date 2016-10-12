@@ -39,7 +39,7 @@ public abstract class BaseAccService extends AccessibilityService {
             }
         }
 
-        //source不知道是怎么确定的
+        //source怎么确定的
 //        AccessibilityNodeInfo source = event.getSource();
 //        if (source != null && source.getText() != null) {
 //            Log.i(TAG, "source = " + source.toString());

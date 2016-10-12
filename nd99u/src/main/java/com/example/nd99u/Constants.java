@@ -27,4 +27,10 @@ public class Constants {
         int SUCCESS = 2;
     }
 
+    public interface EVENT_MSG{
+        String RESET = "RESET";
+        String STOP = "STOP";
+        String START = "START";
+    }
+
 }
