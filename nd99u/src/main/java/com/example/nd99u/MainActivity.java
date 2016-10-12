@@ -17,14 +17,12 @@ import com.demo.dragonjiang.accessilibility_sdk.core.command.shellCmd.ShellHomeC
 import com.demo.dragonjiang.accessilibility_sdk.utils.LaunchUtil;
 import com.demo.dragonjiang.accessilibility_sdk.utils.SPUtils;
 import com.demo.dragonjiang.accessilibility_sdk.utils.TimeUtil;
-import com.example.nd99u.utils.log.utils.LogUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-import rx.Subscriber;
 import rx.functions.Action1;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, TimePickerDialog
@@ -77,18 +75,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(i);
 
         } else if (id == R.id.btn_test_launch) {
-            SPUtils.put(this, Constants.SP_KEY.RESULT, Constants.RUN_RESULT.NONE);
+            clearResult();
             saveNames();
             saveLaunchTime();
+
+            EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.RESET));
+            EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.START));
+
             LaunchUtil.luanchApp(Constants.APP_PKG, MainActivity.this);
 
         } else if (id == R.id.btn_start) {
-
+            clearResult();
             saveNames();
             saveLaunchTime();
 
-            NotificationService.startService(MainActivity.this);
             EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.START));
+            NotificationService.startService(MainActivity.this);
 
             CmdExecutor.executeObservable(new ShellHomeCmd()).delaySubscription(1000, TimeUnit.MILLISECONDS)
                     .subscribe(new Action1<Integer>() {
@@ -166,5 +168,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void saveNames() {
         SPUtils.put(this, Constants.SP_KEY.NAME, mEtName.getText().toString());
+    }
+
+    private void clearResult(){
+        SPUtils.put(this, Constants.SP_KEY.RESULT, Constants.RUN_RESULT.NONE);
+        SPUtils.put(this, Constants.SP_KEY.LAST_RESULT, Constants.RUN_RESULT.NONE);
     }
 }
