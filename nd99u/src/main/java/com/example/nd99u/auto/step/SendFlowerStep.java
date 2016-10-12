@@ -126,11 +126,11 @@ public class SendFlowerStep implements IStep {
                         } else {
                             Log.i(TAG, this.toString() + " Ok! not last flower name ");
 
-                            mMachine.removeFlowerName();
-                            mMachine.resetFlowerStep();
                             Observable.timer(2000, TimeUnit.MILLISECONDS, Schedulers.io()).subscribe(new Action1<Long>() {
                                 @Override
                                 public void call(Long aLong) {
+                                    mMachine.removeFlowerName();
+                                    mMachine.resetFlowerStep();
                                     mMachine.execCmd(new BackCmd());
                                 }
                             });
