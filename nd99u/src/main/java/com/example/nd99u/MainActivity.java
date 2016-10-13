@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.RESET));
             EventBus.getDefault().post(new MsgEvent(Constants.EVENT_MSG.START));
 
-            LaunchUtil.luanchApp(Constants.APP_PKG, MainActivity.this);
+            LaunchUtil.launchApp(Constants.APP_PKG, MainActivity.this);
 
         } else if (id == R.id.btn_start) {
             clearResult();

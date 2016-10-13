@@ -166,43 +166,35 @@ public class NotificationHelper {
         PowerManager pm = (PowerManager) mContext.getSystemService(POWER_SERVICE);
         boolean isScreenOn = pm.isScreenOn();//如果为true，则表示屏幕“亮”了，否则屏幕“暗”了。
         if (!isScreenOn) {
-            CmdExecutor.executeCancelable(new ShellPowerCmd(), 0, false).doOnError(new Action1<Throwable>() {
+            Log.i(TAG, "screen is off");
+            CmdExecutor.executeObservable(new ShellPowerCmd()).doOnError(new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-
+                    Log.e(TAG, throwable.getMessage());
                 }
             }).subscribe();
-            Log.i(TAG, "screen off");
         }
 
+        releaseWakeLock();
         if (mWakelock == null) {
             mWakelock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP |
                     PowerManager.SCREEN_DIM_WAKE_LOCK, "target"); // this target for tell OS which app control screen
         }
-        try {
-            mWakelock.release();//always release before acquiring for safety just in case
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         mWakelock.setReferenceCounted(false);
         mWakelock.acquire();
-
         Log.i(TAG, "wakelock");
+
+
         // 键盘锁管理器对象
         KeyguardManager km = (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
-        // 这里参数”kale”作为调试时LogCat中的Tag
+        // 这里参数”tag”作为调试时LogCat中的Tag
         KeyguardManager.KeyguardLock kl = km.newKeyguardLock("tag");
-        if (km.inKeyguardRestrictedInputMode()) {
+//        if (km.inKeyguardRestrictedInputMode()) {
             // 解锁键盘
             kl.disableKeyguard();
-            CmdExecutor.executeCancelable(new ShellPowerCmd(), 0, false).doOnError(new Action1<Throwable>() {
-                @Override
-                public void call(Throwable throwable) {
-
-                }
-            }).subscribe();
             Log.i(TAG, "locking");
-        }
+//        }
     }
 
     /**
@@ -223,26 +215,25 @@ public class NotificationHelper {
      */
     public void launchApp() {
         if (!LaunchUtil.isAppOnForeground(ContextUtils.getAppContext(), Constants.APP_PKG)) {
-            LaunchUtil.luanchApp(Constants.APP_PKG, ContextUtils.getAppContext());
+            LaunchUtil.launchApp(Constants.APP_PKG, ContextUtils.getAppContext());
 
         } else {
-            CmdExecutor.executeCancelable(new ShellHomeCmd(), 0, false)
-                    .subscribe(new Subscriber<Integer>() {
-                        @Override
-                        public void onCompleted() {
-                            LaunchUtil.luanchApp(Constants.APP_PKG, ContextUtils.getAppContext());
-                        }
+            CmdExecutor.executeObservable(new ShellHomeCmd()).subscribe(new Subscriber<Integer>() {
+                @Override
+                public void onCompleted() {
+                    LaunchUtil.launchApp(Constants.APP_PKG, ContextUtils.getAppContext());
+                }
 
-                        @Override
-                        public void onError(Throwable e) {
+                @Override
+                public void onError(Throwable e) {
 
-                        }
+                }
 
-                        @Override
-                        public void onNext(Integer integer) {
+                @Override
+                public void onNext(Integer integer) {
 
-                        }
-                    });
+                }
+            });
         }
     }
 

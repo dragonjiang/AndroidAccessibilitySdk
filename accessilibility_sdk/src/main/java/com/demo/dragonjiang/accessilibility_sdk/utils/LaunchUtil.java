@@ -16,7 +16,7 @@ import java.util.List;
 public class LaunchUtil {
     private static final String TAG = "LaunchUtil";
 
-    public static void luanchApp(String packageName, Context context) {
+    public static void launchApp(String packageName, Context context) {
         if (TextUtils.isEmpty(packageName) || context == null) {
             return;
         }
